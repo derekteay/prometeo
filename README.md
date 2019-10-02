@@ -18,7 +18,7 @@ So, let us explain how we achieved this through this readme.
 
 As you can see, our project has 5 major blocks, The Sensor, IBM IoT Hub, NodeRed, Container service and the client. Lets review them one by one.
 
-### The Sensor
+### The Device
 
 For this part of the project, we used a board based on the ESP8266 micro-controller with NodeMCU firmware, as this project will be open source. To this controller, we attached a couple of sensors, the DHT11 which give us information about Temperature and Humidity and the MQ-2 sensor which give us, among the concentration of several gases, the concentration of smoke.
 
@@ -28,8 +28,45 @@ The following image is the final result with a firefighter wearing it.
 
 ![alt text](https://github.com/joraco-dev/prometeo/blob/master/content/sensor.png)
 
-Finally, the code that makes possible to read those metrics and send it to the next stage (IBM IoT Hub) [could be reviewed here](https://github.com/joraco-dev/prometeo/blob/master/sensor/sensor.c). There are some things to have in mind reading this code:
-	
+### Setting up the hardware 
+
+![Alt text](content/prometeo_smoke_sensor_wiring.jpeg)
+- Smoke sensor (ESP8266 to sensor)
+  - A0 to XX
+  - RSV to XX
+  - 3V3 to XX
+
+![Alt text](content/prometeo_temp_sensor_wiring.jpeg)
+- Humidity/temperature sensor (ESP8266 to sensor)
+  - D1 to XX
+  - 3V3 to XX
+  - GND to XX
+  
+### Setting up the software
+
+This project, at least the part of the board, has been developed with Arudino, so you will need the IDE if you want to use our example, you can get it here (https://www.arduino.cc/en/main/software).
+
+Once it’s installed the Arudino IDE, you should install third party libraries for the ESP8266 board (the one that we use).
+In order to do that, you should add this repository as follows:
+- Go to `Preferences`, then under `Additional Boards Manager URLs`, add this URL - https://arduino.esp8266.com/stable/package_esp8266com_index.json. (If you already have some other repositories, separate them with a comma.)
+
+Next thing to do, is add our board.
+- Click on `Tools Menu`
+- Click on `Board` section
+- Click on `Boards Manager`.
+- Search for `esp8266` and install the board called `esp8266 by ESP8266 Community` (as of this writing, the selected version is 2.5.0)
+
+The last thing is to install the libraries used by our project, we use libraries for the temperature sensor, for forming a JSON in order to send the data to the IBM IoT Cloud, we will need to install the following libraries.
+- Go to Sketch menu and select `Include library` 
+- Select `Manage Libraries`, then we will search and install the following libraries:
+  - Adafruit ESP8266 by Adafruit - version 1.0.0
+  - ArduinoJson by Benoit Blanchon - version 5.13.5 (IMPORTANT!, the code need this specific version, as the upper version change the way it acces the information, from array to pointer, and will not compile if you don’t use this specific version)
+  - DHT sensor library by Adafruit - version 1.3.4
+  - EspMQTTClient by Patrick Lapointe - version 1.5.0
+
+Once all this pre-requisites are met, you can start compiling the code, [found here](https://github.com/joraco-dev/prometeo/blob/master/sensor/sensor.c).
+
+### Additional Setup Notes:
 - The connectivity to the internet is intended to do it with tethering with a mobile phone, so you need to supply SSID and password of the wifi-hotspot.
 - You need to take into consideration that the pins will vary if you decide to us another board or type of sensors, in our case for the Temperature and Humidity we use de the digital pin 5 and for the smoke sensor we used the analog pin 0.
 - You will need a valid token for the IoT Hub and register your device in the Hub
